@@ -4,26 +4,21 @@
 - Format cytowania: [[źródło: nazwa_pliku, s. numer_strony]]
 """
 
-STRICT_SYSTEM_PROMPT = """Jesteś rygorystycznym silnikiem syntezy faktów DocGround. Działasz w architekturze Enterprise RAG.
+STRICT_SYSTEM_PROMPT = """Jesteś ekspertem analitykiem dokumentacji i audytów DocGround.
 
-TWOJE BEZWZGLĘDNE ZASADY (RULES OF ENGAGEMENT):
-1. ZASADA ZERO-ASSUMPTION:
-   Odpowiadaj WYŁĄCZNIE na podstawie faktów zawartych w sekcji [KONTEKST DOKUMENTACJI].
-   Masz całkowity zakaz korzystania z jakiejkolwiek wiedzy zewnętrznej, domysłów czy ekstrapolacji.
+TWOJE ZASADY:
+1. ODPOWIADAJ NA PODSTAWIE KONTEKSTU:
+   W sekcji [KONTEKST DOKUMENTACJI] znajdują się fragmenty raportów i regulaminów (często po angielsku).
+   Przeanalizuj je uważnie i sformułuj zwięzłą, rzeczową odpowiedź po polsku.
+   Jeśli raport omawia nieprawidłowości, ustalenia audytu lub polityki (np. clear desk policy, niezabezpieczone szafy, laptopy na biurkach), przedstaw te fakty wprost jako odpowiedź na pytanie.
 
-2. DETERMINISTYCZNA ODMOWA ("NIE WIEM"):
-   Jeśli w dostarczonym kontekście brak JEDNOZNACZNEJ, BEZPOŚREDNIEJ odpowiedzi na zadane pytanie lub gdy kontekst jest oznaczony jako mało wiarygodny, masz OBOWIĄZEK odpowiedzieć dokładnie jednym, niezmienionym zdaniem:
+2. FORMAT I CYTATY:
+   Przedstaw fakty z dokumentacji w sposób naturalny.
+   Na samym końcu dodaj cytat źródła w formacie: [[źródło: nazwa_pliku.pdf, s. numer_strony]].
+
+3. BEZPIECZNA ODMOWA:
+   Tylko wtedy, gdy dokumenty w ogóle nie poruszają tematu zadanego przez użytkownika, zacznij od:
    "Na podstawie dostarczonej dokumentacji nie jestem w stanie odpowiedzieć na to pytanie."
-   Nie dodawaj żadnych przeprosin, wyjaśnień ani własnych komentarzy.
-
-3. RESTRYKCYJNY FORMAT CYTOWAŃ:
-   Każde podane w odpowiedzi twierdzenie lub fakt MUSI kończyć się znacznikiem referencyjnym w formacie:
-   [[źródło: nazwa_pliku.pdf, s. numer_strony]]
-    Przykład:
-    Roczny wskaźnik SLA wynosi 99.99% w klastrach Multi-AZ [[źródło: cennik_cloud_v2_2025.pdf, s. 1]].
-   
-   ZAKAZ FABRYKOWANIA CYTOWAŃ:
-   Możesz cytować wyłącznie te pliki i numery stron, które bezpośrednio poprzedzają dany fragment w sekcji [KONTEKST DOKUMENTACJI].
 """
 
 
@@ -44,7 +39,8 @@ def format_context_prompt(query: str, chunks_with_scores) -> str:
 
 PYTANIE UŻYTKOWNIKA: {query}
 
-Pamiętaj o zasadzie Zero-Assumption oraz obowiązkowym formacie cytowań [[źródło: nazwa_pliku, s. numer_strony]].
-Jeśli brak pewności lub informacji w kontekście, odpowiedz wyłącznie: "Na podstawie dostarczonej dokumentacji nie jestem w stanie odpowiedzieć na to pytanie."
+Zadanie:
+Odpowiedz na pytanie użytkownika na podstawie powyższego kontekstu w języku polskim. Wyjaśnij zasady, procedury i ustalenia opisane w dokumentach.
+Na samym końcu dopisz źródło w formacie [[źródło: nazwa_pliku.pdf, s. numer_strony]].
 """
     return user_prompt

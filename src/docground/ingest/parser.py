@@ -7,7 +7,7 @@
 
 import pdfplumber
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Union
 from dataclasses import dataclass
 from tabulate import tabulate
 
@@ -26,14 +26,16 @@ class LayoutAwareParser:
     def __init__(self):
         pass
 
-    def parse_pdf(self, file_path: Path) -> List[RawBlock]:
+    def parse_pdf(self, file_path: Union[str, Path], max_pages: Optional[int] = None) -> List[RawBlock]:
+        """Ekstrahuje tabele i tekst z pliku PDF z zachowaniem metadanych layoutu."""
         file_path = Path(file_path)
         doc_name = file_path.name
         doc_type = file_path.suffix.lstrip(".").lower()
         blocks: List[RawBlock] = []
 
         with pdfplumber.open(file_path) as pdf:
-            for page_idx, page in enumerate(pdf.pages, start=1):
+            pages_to_process = pdf.pages[:max_pages] if max_pages else pdf.pages
+            for page_idx, page in enumerate(pages_to_process, start=1):
                 # 1. Wykrywanie i ekstrakcja tabel
                 tables = page.find_tables()
                 table_bboxes = [table.bbox for table in tables]

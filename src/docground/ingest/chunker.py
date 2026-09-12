@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import List
 from docground.models import DocumentChunk, ChunkType
 from docground.ingest.parser import RawBlock, LayoutAwareParser
+from docground.ingest.semantic_tagger import enrich_chunk
 from docground.config import RAW_DATA_DIR, PROCESSED_DATA_DIR, CHUNKS_PATH, settings
 
 
@@ -88,14 +89,15 @@ class SemanticTablePreservingChunker:
                             page_number=block.page_number,
                             chunk_type=ChunkType.TEXT,
                             content=window_text,
-                            raw_context_anchor=generate_anchor(window_text),
                             metadata={**block.metadata, "window_index": i // step}
                         )
                     )
                     if i + self.max_tokens >= token_count:
                         break
 
-        return chunks
+        # Wzbogacenie o semantyczne tagi (PL/EN)
+        enriched_chunks = [enrich_chunk(c) for c in chunks]
+        return enriched_chunks
 
 
 def process_and_index_corpus(raw_dir: Path = RAW_DATA_DIR, output_file: Path = CHUNKS_PATH) -> List[DocumentChunk]:

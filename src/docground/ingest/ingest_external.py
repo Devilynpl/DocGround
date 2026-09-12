@@ -69,11 +69,8 @@ def ingest_dataset(
                 shutil.copy2(pdf_path, dest)
 
         try:
-            # Parse blocks
-            blocks = parser.parse_pdf(pdf_path)
-            # Filter pages if requested
-            if max_pages_per_pdf > 0:
-                blocks = [b for b in blocks if b.page_number <= max_pages_per_pdf]
+            # Parse only requested initial pages directly for maximum speed
+            blocks = parser.parse_pdf(pdf_path, max_pages=max_pages_per_pdf if max_pages_per_pdf > 0 else None)
 
             chunks = chunker.chunk_blocks(blocks)
             added_for_file = 0

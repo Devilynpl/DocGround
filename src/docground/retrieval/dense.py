@@ -14,8 +14,12 @@ class DenseRetriever:
         print(f"[DenseRetriever] Ładowanie modelu embeddingów: {model_name}...")
         self.embedding_model = TextEmbedding(model_name=model_name)
         
-        # Wygenerowanie embeddingów dla wszystkich chunków
-        contents = [f"{c.doc_name} (strona {c.page_number}): {c.content}" for c in chunks]
+        # Wygenerowanie embeddingów dla wszystkich chunków (z uwzględnieniem tagów semantycznych)
+        contents = []
+        for c in chunks:
+            tags_hdr = c.metadata.get("tags_header", "") if c.metadata else ""
+            prefix = f"[{tags_hdr}] " if tags_hdr else ""
+            contents.append(f"{c.doc_name} (strona {c.page_number}) {prefix}: {c.content}")
         embeddings_list = list(self.embedding_model.embed(contents))
         self.doc_embeddings = np.array(embeddings_list, dtype=np.float32)
         # Normalizacja L2 do szybkiego obliczania cosinusowego jako iloczyn skalarny

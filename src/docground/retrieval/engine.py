@@ -11,6 +11,7 @@ from docground.retrieval.bm25 import BM25Retriever
 from docground.retrieval.dense import DenseRetriever
 from docground.retrieval.rrf import reciprocal_rank_fusion
 from docground.retrieval.reranker import CrossEncoderReranker
+from docground.retrieval.query_expander import expand_query
 
 
 def load_chunks(chunks_path: Path = CHUNKS_PATH) -> List[DocumentChunk]:
@@ -37,11 +38,14 @@ class HybridSearchEngine:
         use_reranker: bool = True
     ) -> Tuple[List[Tuple[DocumentChunk, float]], bool]:
         """Wykonuje pełny potok hybrydowy (BM25 + Dense -> RRF -> Reranker)."""
+        # Rozwijamy zapytanie o synonimy / angielskie pojęcia (Query Expansion)
+        search_query = expand_query(query)
+
         # 1. Sparse BM25 (top 20)
-        bm25_res = self.bm25.search(query, top_k=settings.bm25_top_k)
+        bm25_res = self.bm25.search(search_query, top_k=settings.bm25_top_k)
 
         # 2. Dense Vector (top 20)
-        dense_res = self.dense.search(query, top_k=settings.dense_top_k, filters=filters)
+        dense_res = self.dense.search(search_query, top_k=settings.dense_top_k, filters=filters)
 
         # 3. Reciprocal Rank Fusion (RRF)
         rrf_res = reciprocal_rank_fusion(
@@ -58,7 +62,7 @@ class HybridSearchEngine:
 
         # 4. Cross-Encoder Reranker
         reranked_res, is_low_confidence = self.reranker.rerank(
-            query=query,
+            query=search_query,
             candidates=candidates,
             top_k=top_k,
             threshold=settings.rejection_threshold

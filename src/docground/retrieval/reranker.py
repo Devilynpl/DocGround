@@ -25,7 +25,11 @@ class CrossEncoderReranker:
         if not candidates:
             return [], True
 
-        pairs = [[query, f"Dokument: {c.doc_name}, Strona: {c.page_number}. Treść: {c.content}"] for c in candidates]
+        pairs = []
+        for c in candidates:
+            tags = c.metadata.get("semantic_tags", []) if c.metadata else []
+            tags_str = f" [Tagi: {', '.join(tags[:10])}]" if tags else ""
+            pairs.append([query, f"Dokument: {c.doc_name}, Strona: {c.page_number}{tags_str}. Treść: {c.content}"])
         raw_scores = self.model.predict(pairs)
 
         # Normalizacja logitów do zakresu (0, 1) za pomocą funkcji sigmoid
