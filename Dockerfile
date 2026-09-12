@@ -13,7 +13,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY pyproject.toml requirements.txt* README.md ./
 COPY src/ ./src/
 
+# Install CPU-only torch FIRST to prevent sentence-transformers from pulling
+# 2.5 GB of CUDA binaries (nvidia_cudnn, nvidia_cublas, nvidia_nccl, etc.)
 RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
+        torch==2.3.1+cpu \
+        torchvision==0.18.1+cpu \
+        --extra-index-url https://download.pytorch.org/whl/cpu && \
     pip install --no-cache-dir -e .
 
 COPY data/processed/ ./data/processed/
