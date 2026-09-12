@@ -137,20 +137,19 @@ if user_input:
     # Odpowiedź asynchroniczna ze streamingiem
     with st.chat_message("assistant"):
         response_placeholder = st.empty()
-        full_text = ""
-        final_payload = None
-
         async def run_stream():
-            nonlocal full_text, final_payload
+            stream_text = ""
+            payload = None
             stream = synthesizer.generate_response_stream(user_input, top_k=top_k_select)
             async for chunk in stream:
                 if chunk["type"] == "token":
-                    full_text += chunk["content"]
-                    response_placeholder.markdown(full_text + "▌")
+                    stream_text += chunk["content"]
+                    response_placeholder.markdown(stream_text + "▌")
                 elif chunk["type"] == "final_response":
-                    final_payload = chunk["payload"]
+                    payload = chunk["payload"]
+            return stream_text, payload
 
-        asyncio.run(run_stream())
+        full_text, final_payload = asyncio.run(run_stream())
         response_placeholder.markdown(full_text)
 
         # Status i Panel Źródeł (Drawer)
