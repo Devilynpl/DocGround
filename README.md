@@ -35,10 +35,12 @@ Wyniki uzyskane za pomocą wbudowanego runnera ewaluacyjnego `python -m docgroun
 ## 🌐 Integracja w Ekosystemie Portfolio AI
 
 DocGround integruje się bezpośrednio z pozostałymi komponentami ekosystemu:
-- ⚖️ **[TheJudge / JudgeKit](file:///c:/Users/rakpa/Documents/Ai_Engineer_Portfolio/TheJudge):** Ciągła bramka jakości CI/CD (`.github/workflows/rag_eval_gate.yml`). JudgeKit audytuje DocGround za pomocą dedykowanego adaptera ([DocGroundTargetAdapter](file:///c:/Users/rakpa/Documents/Ai_Engineer_Portfolio/DocGround/tests/evals/judge_adapter.py)), blokując commity/PR-y przy spadku wierności ($< 0.95$), fałszywych cytowaniach ($< 0.90$) lub regresji opóźnień P95.
-- 🏢 **[BriefAgent](file:///c:/Users/rakpa/Documents/Ai_Engineer_Portfolio/BriefAgent):** Wewnętrzny potok wyszukiwania i parsowania tabel DocGround stanowi bazę ustrukturyzowanej wiedzy dla autonomicznego agenta badawczego.
+- 🔀 **[Tollgate](https://github.com/Devilynpl/TollGate):** Centralny bramka LLM Gateway (FastAPI) z rate-limitingiem RPM, semantycznym cache'em (podobieństwo cosinus ≥ 0.92), guardrailsami regex i dziennym budżetem tokenów. DocGround kieruje wszystkie wywołania syntezy przez `POST /v1/chat` Tollgate zamiast bezpośrednio do Gemini API.
+- ⚖️ **[TheJudge / JudgeKit](https://github.com/Devilynpl/TheJudge):** Ciągła bramka jakości CI/CD (`.github/workflows/rag_eval_gate.yml`). JudgeKit audytuje DocGround za pomocą dedykowanego adaptera (`DocGroundTargetAdapter`), blokując commity/PR-y przy spadku wierności (< 0.95), fałszywych cytowaniach (< 0.90) lub regresji opóźnień P95.
+- 🏢 **[BriefAgent](https://github.com/Devilynpl/BriefAgent):** Wewnętrzny potok wyszukiwania i parsowania tabel DocGround stanowi bazę ustrukturyzowanej wiedzy dla autonomicznego agenta badawczego.
 
 ---
+
 
 ## 🏛️ Architektura Systemu
 
