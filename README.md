@@ -64,7 +64,7 @@ docground/
 
 ### 1. Klonowanie i przygotowanie środowiska
 ```bash
-git clone https://github.com/.../DocGround.git
+git clone https://github.com/Devilynpl/DocGround.git
 cd DocGround
 
 # Utworzenie i aktywacja wirtualnego środowiska
