@@ -32,8 +32,8 @@ def test_hybrid_search_engine_initialization_and_search():
     engine = HybridSearchEngine()
     assert len(engine.chunks) > 0
 
-    results, is_low = engine.search("Jaki był zysk netto w Q3?", top_k=3)
+    results, is_low = engine.search("Ile wynosi cena Standard Cloud VM?", top_k=3)
     assert len(results) > 0
     top_chunk, score = results[0]
-    assert top_chunk.doc_name == "raport_finansowy_q3_2025.pdf"
+    assert "cennik_cloud" in top_chunk.doc_name
     assert is_low is False

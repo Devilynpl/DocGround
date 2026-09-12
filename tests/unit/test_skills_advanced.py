@@ -67,7 +67,7 @@ def synthesizer() -> GroundedSynthesizer:
 # Testy RAG Engineer & Pytest Parametrize Patterns
 # -------------------------------------------------------------
 @pytest.mark.parametrize("query,expected_keyword", [
-    ("Jaki był zysk netto w Q3 2025 roku?", "46.2"),
+    ("Ile wynosi cena Standard Cloud VM w cenniku 2025?", "189 PLN"),
     ("Ile wynosi udział własny przy kradzieży sprzętu z pojazdu?", "1 500 PLN"),
     ("Co oznacza błąd ERR_0x8004?", "422"),
 ])
@@ -126,7 +126,7 @@ def test_zero_assumption_deterministic_rejection(synthesizer, out_of_domain_quer
 def test_citation_validator_strict_boundary(citation_validator, sample_chunks):
     """Test LLM-Eval Groundedness: weryfikacja czy walidator natychmiast wychwytuje manipulację stroną."""
     # Podmieniamy stronę na nieistniejącą (strona 9 zamiast 1)
-    manipulated_answer = "Zysk netto wyniósł 46.2 mln PLN [[źródło: raport_finansowy_q3_2025.pdf, s. 9]]."
+    manipulated_answer = "Cena Standard Cloud VM wynosi 189 PLN [[źródło: cennik_cloud_v2_2025.pdf, s. 9]]."
     is_valid, sources, _ = citation_validator.validate_citations(manipulated_answer, sample_chunks)
 
     assert is_valid is False

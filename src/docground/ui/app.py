@@ -63,16 +63,15 @@ st.markdown("""
 
 
 @st.cache_resource(show_spinner="Inicjalizacja silnika hybrydowego DocGround...")
-def get_synthesizer():
-    return GroundedSynthesizer()
+def get_synthesizer(use_local_llm: bool = False):
+    return GroundedSynthesizer(use_local_llm=use_local_llm)
 
-
-synthesizer = get_synthesizer()
 
 # Sidebar: Parametry i Benchmarks
 with st.sidebar:
     st.image("https://img.shields.io/badge/Architecture-Hybrid%20RRF%20%2B%20Reranker-blue?style=for-the-badge", use_container_width=True)
     st.markdown("### ⚙️ Konfiguracja Retrievalu")
+    use_llm_toggle = st.toggle("🤖 Lokalny LLM (Qwen2.5-3B)", value=False, help="Przełącz między lokalną siecią neuronową (Qwen2.5-3B GGUF) a ultra-szybkim silnikiem reguł faktograficznych.")
     top_k_select = st.slider("Liczba chunków (Top K)", min_value=1, max_value=8, value=5)
     rerank_toggle = st.toggle("Cross-Encoder Reranker", value=True)
     rejection_thresh = st.slider("Próg odrzucenia (Rejection Threshold)", min_value=0.10, max_value=0.60, value=0.30, step=0.05)
@@ -90,15 +89,17 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("### 💡 Przykładowe zapytania testowe:")
     sample_queries = [
-        "Jaki był zysk netto w Q3 2025 roku?",
+        "Jaka jest definicja Popularity Trap w social media?",
         "Jaka jest marża NovaPay dla kart debetowych?",
         "Ile wynosi cena Standard Cloud VM w cenniku 2025 (v2)?",
-        "Co oznacza kod błędu ERR_0x8004 w API Gateway?",
+        "Czym charakteryzuje się problem Dial-a-Ride ze zsynchronizowanymi wizytami?",
         "Ile wynosi stopa bezrobocia w Japonii? (Out-of-Domain)"
     ]
     for sq in sample_queries:
         if st.button(sq, key=f"btn_{sq}", use_container_width=True):
             st.session_state["selected_prompt"] = sq
+
+synthesizer = get_synthesizer(use_local_llm=use_llm_toggle)
 
 st.markdown('<div class="main-header">🛡️ DocGround: Enterprise Grounded RAG</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">Layout-Aware Ingestion • BM25 + Dense RRF • Cross-Encoder Reranker • Citation Validator</div>', unsafe_allow_html=True)

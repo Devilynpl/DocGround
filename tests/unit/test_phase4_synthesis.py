@@ -58,8 +58,8 @@ async def test_grounded_synthesizer_streaming_and_rejection():
     assert final_resp_ood.is_confident is False
     assert len(final_resp_ood.sources) == 0
 
-    # 2. Test pytania ze znajomością kontekstu (np. zysk w Q3)
-    stream_valid = synthesizer.generate_response_stream("Jaki był zysk netto w Q3 2025 roku?")
+    # 2. Test pytania ze znajomością kontekstu (np. cennik Cloud VM)
+    stream_valid = synthesizer.generate_response_stream("Ile wynosi cena Standard Cloud VM w cenniku 2025?")
     tokens_valid = []
     final_resp_valid = None
 
@@ -70,8 +70,8 @@ async def test_grounded_synthesizer_streaming_and_rejection():
             final_resp_valid = chunk["payload"]
 
     full_text_valid = "".join(tokens_valid).strip()
-    assert "46.2" in full_text_valid
-    assert "[[źródło: raport_finansowy_q3_2025.pdf, s. 1]]" in full_text_valid
+    assert "189" in full_text_valid
+    assert "[[źródło: cennik_cloud_v2_2025.pdf, s. 1]]" in full_text_valid
     assert final_resp_valid.is_confident is True
     assert len(final_resp_valid.sources) > 0
     assert final_resp_valid.sources[0].is_verified is True

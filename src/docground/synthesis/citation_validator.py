@@ -8,7 +8,7 @@ from typing import List, Tuple, Dict, Any, Optional
 from docground.models import DocumentChunk, SourceReference
 
 # Format cytowania: [[źródło: nazwa_pliku.pdf, s. 1]]
-CITATION_REGEX = re.compile(r"\[\[(?:źródło|source):\s*([a-zA-Z0-9_\-\.]+),\s*(?:s\.|strona|p\.)\s*(\d+)\]\]", re.IGNORECASE)
+CITATION_REGEX = re.compile(r"\[\[(?:źródło|source):\s*(.+?),\s*(?:s\.|strona|p\.)\s*(\d+)\]\]", re.IGNORECASE)
 
 
 class CitationValidator:

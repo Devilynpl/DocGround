@@ -2,52 +2,26 @@
   {
     "id": "table_01",
     "category": "table_qa",
-    "question": "Jaki był zysk netto Grupy NovaPay w Q3 2025 roku według raportu finansowego?",
-    "expected_doc": "raport_finansowy_q3_2025.pdf",
+    "question": "Jaki kod błędu HTTP i identyfikator odpowiada błędowi ERR_0x8004 w specyfikacji API Gateway?",
+    "expected_doc": "api_gateway_spec_v3.pdf",
     "expected_page": 1,
     "expected_answer_keywords": [
-      "46.2",
-      "46,2",
-      "mln PLN"
+      "422",
+      "422 Unprocessable",
+      "INSUFFICIENT_FUNDS_RESE"
     ],
     "is_answerable": true
   },
   {
     "id": "table_02",
     "category": "table_qa",
-    "question": "Ile wynosiła skorygowana EBITDA w Q2 2025 roku?",
-    "expected_doc": "raport_finansowy_q3_2025.pdf",
+    "question": "Jakie rozwiązanie wdrożono dla Wymogu 8 w audycie PCI-DSS w obszarze uwierzytelniania wieloskładnikowego?",
+    "expected_doc": "audyt_pci_dss_2025.pdf",
     "expected_page": 1,
     "expected_answer_keywords": [
-      "53.9",
-      "53,9",
-      "mln PLN"
-    ],
-    "is_answerable": true
-  },
-  {
-    "id": "table_03",
-    "category": "table_qa",
-    "question": "Jaka była dynamika wzrostu przychodów ze sprzedaży r/r w Q3 2025?",
-    "expected_doc": "raport_finansowy_q3_2025.pdf",
-    "expected_page": 1,
-    "expected_answer_keywords": [
-      "+29.5%",
-      "29.5%",
-      "29,5%"
-    ],
-    "is_answerable": true
-  },
-  {
-    "id": "table_04",
-    "category": "table_qa",
-    "question": "Jaki był udział rynku polskiego w przychodach w Q3 2025?",
-    "expected_doc": "raport_finansowy_q3_2025.pdf",
-    "expected_page": 2,
-    "expected_answer_keywords": [
-      "64.0%",
-      "64%",
-      "118.2"
+      "FIDO2",
+      "WebAuthn",
+      "FIDO2/WebAuthn"
     ],
     "is_answerable": true
   },
@@ -299,19 +273,6 @@
       "+45 pkt",
       "45 punktów",
       "45 pkt"
-    ],
-    "is_answerable": true
-  },
-  {
-    "id": "cross_10",
-    "category": "cross_lingual",
-    "question": "Jakie oprocentowanie ma kredyt konsorcjalny Grupy NovaPay wskazany w raporcie finansowym?",
-    "expected_doc": "raport_finansowy_q3_2025.pdf",
-    "expected_page": 2,
-    "expected_answer_keywords": [
-      "WIBOR 3M + 1.85%",
-      "WIBOR 3M",
-      "1.85%"
     ],
     "is_answerable": true
   },

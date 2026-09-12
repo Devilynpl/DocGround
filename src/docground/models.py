@@ -11,7 +11,7 @@ class ChunkType(str, Enum):
 
 class DocumentChunk(BaseModel):
     chunk_id: str = Field(description="Unikalny hash sha256 z treści i metadanych źródłowych")
-    doc_name: str = Field(description="Nazwa pliku dokumentu, np. raport_finansowy_q3.pdf")
+    doc_name: str = Field(description="Nazwa pliku dokumentu, np. specyfikacja.pdf")
     doc_type: str = Field(description="Typ dokumentu, np. pdf, html, docx")
     page_number: int = Field(description="Fizyczny numer strony w dokumencie (1-indexed)")
     chunk_type: ChunkType = Field(description="Typ zawartości chunka: text, table, header")
