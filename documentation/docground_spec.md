@@ -34,22 +34,22 @@ class DocumentChunk(BaseModel):
 
 ---
 
-## Faza 2: Eval-First — Budowa Golden Setu i metryk przed RAG-iem
-Nie budujemy retrievalu „na oko”. W tej fazie tworzysz fundament testowy, który będzie obiektywnym sędzią dla każdej zmiany algorytmu.
+## ~~Faza 2: Eval-First — Budowa Golden Setu i metryk przed RAG-iem~~
+~~Nie budujemy retrievalu „na oko”. W tej fazie tworzysz fundament testowy, który będzie obiektywnym sędzią dla każdej zmiany algorytmu.~~
 
-- [ ] Przygotowanie specyficznego Golden Setu (40–60 pytań):
-  - Pytania tabelaryczne (Table QA): Pytania o konkretne komórki (np. „Jaki był zysk netto w Q3 wg tabeli 4 na stronie 12?”).
-  - Pytania wielojęzyczne / krzyżowe: Pytania po polsku do dokumentacji angielskiej (lub odwrotnie).
-  - Pytania sprzeczne temporalnie: Porównanie wersji (np. stary cennik vs nowy cennik — system musi wybrać właściwy na podstawie metadanych).
-  - Pytania spoza korpusu (Unanswerable / Out-of-Domain): Min. 20% pytań, na które w dokumentach nie ma odpowiedzi (test na deterministyczne „nie wiem”).
-- [ ] Definicja 5 kluczowych metryk (metryki sukcesu w README):
-  - Recall@K (Retrieval Recall): Czy właściwy chunk z odpowiedzią znalazł się w top K pobranych dokumentów?
-  - Faithfulness (Wierność): Brak halucynacji — czy każda informacja wynika bezpośrednio z pobranego kontekstu.
-  - Citation Precision (Precyzja cytowań): Odsetek cytowań, które rzeczywiście wskazują właściwy plik, stronę i dokładnie wspierają dane zdanie.
-  - P95 Latency: Czas generacji odpowiedzi dla 95% najtrudniejszych zapytań.
-  - Cost per 100 Queries: Całkowity koszt tokenów (embedder + LLM + reranker) na 100 wywołań.
-- [ ] Zautomatyzowany runner walidacji (CLI):
-  - Prosty skrypt `python -m docground.evaluate`, który uruchamia zbiór testowy i zwraca wyniki w tabeli terminala.
+- [x] ~~**Przygotowanie specyficznego Golden Setu (40–60 pytań):**~~
+  - ~~Pytania tabelaryczne (Table QA): Pytania o konkretne komórki (15 pytań).~~
+  - ~~Pytania wielojęzyczne / krzyżowe: Pytania po polsku do dokumentacji angielskiej (10 pytań).~~
+  - ~~Pytania sprzeczne temporalnie: Porównanie wersji v1 vs v2 (12 pytań).~~
+  - ~~Pytania spoza korpusu (Unanswerable / Out-of-Domain): Min. 20% pytań (13 pytań = 26% zbioru, test deterministycznego „nie wiem”).~~ *(Zrealizowano 50 pytań w `tests/evals/golden_set.json`)*
+- [x] ~~**Definicja 5 kluczowych metryk (metryki sukcesu w README):**~~
+  - ~~Recall@K (Retrieval Recall): Czy właściwy chunk z odpowiedzią znalazł się w top K pobranych dokumentów.~~
+  - ~~Faithfulness (Wierność): Brak halucynacji — czy każda informacja wynika bezpośrednio z pobranego kontekstu.~~
+  - ~~Citation Precision (Precyzja cytowań): Odsetek cytowań, które rzeczywiście wskazują właściwy plik, stronę i dokładnie wspierają dane zdanie.~~
+  - ~~P95 Latency: Czas generacji odpowiedzi dla 95% najtrudniejszych zapytań.~~
+  - ~~Cost per 100 Queries: Całkowity koszt tokenów (embedder + LLM + reranker) na 100 wywołań.~~ *(Zrealizowano w `docground.evals.metrics`)*
+- [x] ~~**Zautomatyzowany runner walidacji (CLI):**~~
+  - ~~Prosty skrypt `python -m docground.evaluate`, który uruchamia zbiór testowy i zwraca wyniki w tabeli terminala.~~ *(Zrealizowano w `docground.evaluate` z formatowaniem `rich`)*
 
 ---
 

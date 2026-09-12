@@ -1,0 +1,612 @@
+[
+  {
+    "id": "table_01",
+    "category": "table_qa",
+    "question": "Jaki był zysk netto Grupy NovaPay w Q3 2025 roku według raportu finansowego?",
+    "expected_doc": "raport_finansowy_q3_2025.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "46.2",
+      "46,2",
+      "mln PLN"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "table_02",
+    "category": "table_qa",
+    "question": "Ile wynosiła skorygowana EBITDA w Q2 2025 roku?",
+    "expected_doc": "raport_finansowy_q3_2025.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "53.9",
+      "53,9",
+      "mln PLN"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "table_03",
+    "category": "table_qa",
+    "question": "Jaka była dynamika wzrostu przychodów ze sprzedaży r/r w Q3 2025?",
+    "expected_doc": "raport_finansowy_q3_2025.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "+29.5%",
+      "29.5%",
+      "29,5%"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "table_04",
+    "category": "table_qa",
+    "question": "Jaki był udział rynku polskiego w przychodach w Q3 2025?",
+    "expected_doc": "raport_finansowy_q3_2025.pdf",
+    "expected_page": 2,
+    "expected_answer_keywords": [
+      "64.0%",
+      "64%",
+      "118.2"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "table_05",
+    "category": "table_qa",
+    "question": "Ile wynosi udział własny (franszyza redukcyjna) w przypadku kradzieży sprzętu z pojazdu w OWU Bezpieczny Biznes?",
+    "expected_doc": "owu_bezpieczny_biznes_2025.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "1 500 PLN",
+      "1500 PLN",
+      "1500"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "table_06",
+    "category": "table_qa",
+    "question": "Jaki jest maksymalny czas zgłoszenia zalania sprzętu elektronicznego według OWU?",
+    "expected_doc": "owu_bezpieczny_biznes_2025.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "3 dni robocze",
+      "3 dni"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "table_07",
+    "category": "table_qa",
+    "question": "Jaka jest marża NovaPay dla płatności kartami debetowymi Visa/Mastercard (PL)?",
+    "expected_doc": "regulamin_platnosci_v2.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "0.45% + 0.10 PLN",
+      "0.45%",
+      "0,45%"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "table_08",
+    "category": "table_qa",
+    "question": "Ile wynosi łączny szacunkowy koszt prowizji dla transakcji BLIK Standard?",
+    "expected_doc": "regulamin_platnosci_v2.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "0.69%",
+      "0,69%"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "table_09",
+    "category": "table_qa",
+    "question": "Jaka akcja jest automatycznie podejmowana przez FraudGuard AI przy punktacji ryzyka 61 - 85 pkt?",
+    "expected_doc": "instrukcja_fraudguard_v1.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "MANUAL_REVIEW_QUEUE",
+      "Wstrzymanie wypłaty na 6 godzin",
+      "weryfikacji"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "table_10",
+    "category": "table_qa",
+    "question": "Jakie uwierzytelnienie jest wymagane w module FraudGuard dla oceny ryzyka 26 - 60 pkt?",
+    "expected_doc": "instrukcja_fraudguard_v1.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "CHALLENGE_3DS2",
+      "3D-Secure 2.2",
+      "biometrią"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "table_11",
+    "category": "table_qa",
+    "question": "Ile wynosi wskaźnik RTO dla usług Tier 1 (Core) w SLA Disaster Recovery?",
+    "expected_doc": "sla_disaster_recovery_2025.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "60 sekund",
+      "Maksymalnie 60 sekund"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "table_12",
+    "category": "table_qa",
+    "question": "Jaki jest dopuszczalny wskaźnik RPO dla Tier 2 (Rozliczenia batch)?",
+    "expected_doc": "sla_disaster_recovery_2025.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "15 minut",
+      "Do 15 minut"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "table_13",
+    "category": "table_qa",
+    "question": "Jaki jest czas reakcji zespołu CERT dla incydentu o poziomie krytyczności KRYTYCZNY (P1)?",
+    "expected_doc": "sop_cyber_security_pl.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "15 minut",
+      "Maksymalnie 15 minut"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "table_14",
+    "category": "table_qa",
+    "question": "Ile wynosi prowizja Revenue Share dla partnera na poziomie Gold Partner?",
+    "expected_doc": "regulamin_partner_2025.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "15.0%",
+      "15%",
+      "15,0%"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "table_15",
+    "category": "table_qa",
+    "question": "Jakie jest opóźnienie (interval) przy 3. próbie doręczenia webhooka w architekturze NovaHook?",
+    "expected_doc": "webhooks_architecture_spec.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "2 minuty",
+      "2m 15s"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "cross_01",
+    "category": "cross_lingual",
+    "question": "Co oznacza kod błędu ERR_0x8004 w API Gateway i jaki kod HTTP jest wtedy zwracany?",
+    "expected_doc": "api_gateway_spec_v3.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "422",
+      "INSUFFICIENT_FUNDS_RESERVE",
+      "escrow account balance"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "cross_02",
+    "category": "cross_lingual",
+    "question": "Jaki jest limit zapytań (rate limit) na minutę w specyfikacji API Gateway v3?",
+    "expected_doc": "api_gateway_spec_v3.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "2 500",
+      "2500",
+      "requests per minute"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "cross_03",
+    "category": "cross_lingual",
+    "question": "Czy klient API powinien automatycznie ponawiać zapytanie w przypadku błędu ERR_0x8004?",
+    "expected_doc": "api_gateway_spec_v3.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "Do NOT retry",
+      "nie ponawiać",
+      "nie należy"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "cross_04",
+    "category": "cross_lingual",
+    "question": "Jaki algorytm i nagłówek są wykorzystywane do podpisywania webhooków NovaHook?",
+    "expected_doc": "webhooks_architecture_spec.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "HMAC-SHA512",
+      "X-Nova-Signature-V2"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "cross_05",
+    "category": "cross_lingual",
+    "question": "Do kiedy jest ważny certyfikat AOC zgodności z PCI-DSS v4.0?",
+    "expected_doc": "audyt_pci_dss_2025.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "14 października 2026",
+      "2026",
+      "QSA-PL-2025-8841"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "cross_06",
+    "category": "cross_lingual",
+    "question": "Jaka technologia została wdrożona do uwierzytelniania wieloskładnikowego wg wymogu 8 audytu PCI-DSS?",
+    "expected_doc": "audyt_pci_dss_2025.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "FIDO2",
+      "WebAuthn"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "cross_07",
+    "category": "cross_lingual",
+    "question": "W jakim czasie należy powiadomić Prezesa UODO w przypadku incydentu krytycznego P1?",
+    "expected_doc": "sop_cyber_security_pl.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "24 godzin",
+      "24h"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "cross_08",
+    "category": "cross_lingual",
+    "question": "Jak często należy rotować klucze szyfrujące bazy danych zgodnie z SOP cyberbezpieczeństwa?",
+    "expected_doc": "sop_cyber_security_pl.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "90-dniowym",
+      "90 dni",
+      "Thales Luna HSM"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "cross_09",
+    "category": "cross_lingual",
+    "question": "O ile punktów wzrasta ocena ryzyka przy regule Velocity Check w FraudGuard AI?",
+    "expected_doc": "instrukcja_fraudguard_v1.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "+45 pkt",
+      "45 punktów",
+      "45 pkt"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "cross_10",
+    "category": "cross_lingual",
+    "question": "Jakie oprocentowanie ma kredyt konsorcjalny Grupy NovaPay wskazany w raporcie finansowym?",
+    "expected_doc": "raport_finansowy_q3_2025.pdf",
+    "expected_page": 2,
+    "expected_answer_keywords": [
+      "WIBOR 3M + 1.85%",
+      "WIBOR 3M",
+      "1.85%"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "temp_01",
+    "category": "temporal",
+    "question": "Ile wynosi miesięczna cena pakietu Standard Cloud VM w aktualnym cenniku 2025 (v2)?",
+    "expected_doc": "cennik_cloud_v2_2025.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "189 PLN",
+      "189"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "temp_02",
+    "category": "temporal",
+    "question": "Ile wynosiła cena pakietu Standard Cloud VM w starym cenniku z 2024 roku (v1)?",
+    "expected_doc": "cennik_cloud_v1_2024.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "149 PLN",
+      "149"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "temp_03",
+    "category": "temporal",
+    "question": "Jaka jest pojemność dysku SSD dla pakietu Business Scale VM w wersji v2 (2025) w porównaniu do v1 (2024)?",
+    "expected_doc": "cennik_cloud_v2_2025.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "600 GB",
+      "500 GB"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "temp_04",
+    "category": "temporal",
+    "question": "Jaka nowa usługa z procesorem graficznym GPU pojawiła się dopiero w cenniku 2025 (v2)?",
+    "expected_doc": "cennik_cloud_v2_2025.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "AI Inference GPU Node",
+      "A10G",
+      "2 890 PLN"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "temp_05",
+    "category": "temporal",
+    "question": "Jak zmienił się gwarantowany roczny wskaźnik SLA w nowym cenniku 2025 w stosunku do roku 2024?",
+    "expected_doc": "cennik_cloud_v2_2025.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "99,99%",
+      "99.99%",
+      "99.9%"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "temp_06",
+    "category": "temporal",
+    "question": "Ile wynosi koszt nadmiarowego transferu (1 TB) dla HighMemory Dedicated w cenniku 2025 (v2)?",
+    "expected_doc": "cennik_cloud_v2_2025.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "10 PLN",
+      "10"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "temp_07",
+    "category": "temporal",
+    "question": "Ile wynosił koszt nadmiarowego transferu (1 TB) dla HighMemory Dedicated w cenniku 2024 (v1)?",
+    "expected_doc": "cennik_cloud_v1_2024.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "15 PLN",
+      "15"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "temp_08",
+    "category": "temporal",
+    "question": "Jaka jest aktualna specyfikacja pamięci RAM i vCPU dla Managed PostgreSQL w cenniku v2.0?",
+    "expected_doc": "cennik_cloud_v2_2025.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "32 GB / 8 vCPU",
+      "32 GB",
+      "8 vCPU"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "temp_09",
+    "category": "temporal",
+    "question": "Jaka była specyfikacja Managed PostgreSQL w starej wersji v1.4?",
+    "expected_doc": "cennik_cloud_v1_2024.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "16 GB / 4 vCPU",
+      "16 GB",
+      "4 vCPU"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "temp_10",
+    "category": "temporal",
+    "question": "Jaki był czas reakcji Support L2 w 2024 roku, a jaki jest gwarantowany w 2025 roku?",
+    "expected_doc": "cennik_cloud_v2_2025.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "30 minut",
+      "4 godzin"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "temp_11",
+    "category": "temporal",
+    "question": "Ile wynosi cena abonamentowa Managed PostgreSQL w cenniku 2025?",
+    "expected_doc": "cennik_cloud_v2_2025.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "450 PLN",
+      "450"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "temp_12",
+    "category": "temporal",
+    "question": "Ile wynosiła cena Managed PostgreSQL w archiwalnym cenniku 2024?",
+    "expected_doc": "cennik_cloud_v1_2024.pdf",
+    "expected_page": 1,
+    "expected_answer_keywords": [
+      "320 PLN",
+      "320"
+    ],
+    "is_answerable": true
+  },
+  {
+    "id": "ood_01",
+    "category": "unanswerable",
+    "question": "Jaka jest polityka zwrotu biletów lotniczych w klasie biznes w liniach Lufthansa?",
+    "expected_doc": null,
+    "expected_page": null,
+    "expected_answer_keywords": [
+      "nie jestem w stanie odpowiedzieć",
+      "brak danych",
+      "nie wiem"
+    ],
+    "is_answerable": false
+  },
+  {
+    "id": "ood_02",
+    "category": "unanswerable",
+    "question": "Ile wynosi stopa bezrobocia w Japonii według najnowszego komunikatu banku centralnego?",
+    "expected_doc": null,
+    "expected_page": null,
+    "expected_answer_keywords": [
+      "nie jestem w stanie odpowiedzieć",
+      "brak danych"
+    ],
+    "is_answerable": false
+  },
+  {
+    "id": "ood_03",
+    "category": "unanswerable",
+    "question": "Jaki jest limit bagażu podręcznego dla pasażerów podróżujących koleją państwową?",
+    "expected_doc": null,
+    "expected_page": null,
+    "expected_answer_keywords": [
+      "nie jestem w stanie odpowiedzieć"
+    ],
+    "is_answerable": false
+  },
+  {
+    "id": "ood_04",
+    "category": "unanswerable",
+    "question": "Ile wynosi opłata za wypłatę z bankomatu Euronet kartą Revolut w Hiszpanii?",
+    "expected_doc": null,
+    "expected_page": null,
+    "expected_answer_keywords": [
+      "nie jestem w stanie odpowiedzieć"
+    ],
+    "is_answerable": false
+  },
+  {
+    "id": "ood_05",
+    "category": "unanswerable",
+    "question": "Jaki jest przepis na ciasto drożdżowe z truskawkami i kruszonką?",
+    "expected_doc": null,
+    "expected_page": null,
+    "expected_answer_keywords": [
+      "nie jestem w stanie odpowiedzieć"
+    ],
+    "is_answerable": false
+  },
+  {
+    "id": "ood_06",
+    "category": "unanswerable",
+    "question": "Ile bramek strzelił Robert Lewandowski w sezonie 2023/2024 ligi hiszpańskiej?",
+    "expected_doc": null,
+    "expected_page": null,
+    "expected_answer_keywords": [
+      "nie jestem w stanie odpowiedzieć"
+    ],
+    "is_answerable": false
+  },
+  {
+    "id": "ood_07",
+    "category": "unanswerable",
+    "question": "Jaka jest wysokość podatku od nieruchomości komercyjnych w mieście Chicago?",
+    "expected_doc": null,
+    "expected_page": null,
+    "expected_answer_keywords": [
+      "nie jestem w stanie odpowiedzieć"
+    ],
+    "is_answerable": false
+  },
+  {
+    "id": "ood_08",
+    "category": "unanswerable",
+    "question": "Kto został dyrektorem generalnym firmy Apple w 2030 roku?",
+    "expected_doc": null,
+    "expected_page": null,
+    "expected_answer_keywords": [
+      "nie jestem w stanie odpowiedzieć"
+    ],
+    "is_answerable": false
+  },
+  {
+    "id": "ood_09",
+    "category": "unanswerable",
+    "question": "Jaka jest procedura wymiany oleju silnikowego w traktorze John Deere 6120M?",
+    "expected_doc": null,
+    "expected_page": null,
+    "expected_answer_keywords": [
+      "nie jestem w stanie odpowiedzieć"
+    ],
+    "is_answerable": false
+  },
+  {
+    "id": "ood_10",
+    "category": "unanswerable",
+    "question": "Ile wynosi zasiłek macierzyński w Szwecji dla osób samozatrudnionych?",
+    "expected_doc": null,
+    "expected_page": null,
+    "expected_answer_keywords": [
+      "nie jestem w stanie odpowiedzieć"
+    ],
+    "is_answerable": false
+  },
+  {
+    "id": "ood_11",
+    "category": "unanswerable",
+    "question": "Jaka jest pojemność zbiornika paliwa w myśliwcu F-16 Block 52+?",
+    "expected_doc": null,
+    "expected_page": null,
+    "expected_answer_keywords": [
+      "nie jestem w stanie odpowiedzieć"
+    ],
+    "is_answerable": false
+  },
+  {
+    "id": "ood_12",
+    "category": "unanswerable",
+    "question": "Jaki jest kod rabatowy na zakupy w księgarni internetowej PWN w maju?",
+    "expected_doc": null,
+    "expected_page": null,
+    "expected_answer_keywords": [
+      "nie jestem w stanie odpowiedzieć"
+    ],
+    "is_answerable": false
+  },
+  {
+    "id": "ood_13",
+    "category": "unanswerable",
+    "question": "Ile wynosi minimalna odległość paneli fotowoltaicznych od granicy działki budowlanej we Francji?",
+    "expected_doc": null,
+    "expected_page": null,
+    "expected_answer_keywords": [
+      "nie jestem w stanie odpowiedzieć"
+    ],
+    "is_answerable": false
+  }
+]
