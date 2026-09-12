@@ -10,9 +10,9 @@ from docground.config import CHUNKS_PATH
 
 def tokenize_code_and_legal(text: str) -> List[str]:
     """Tokenizator zachowujący kody np. ERR_0x8004, paragrafy § 1 ust. 2, liczby i słowa."""
-    # Zamiana znaków specjalnych poza podkreśleniami i kropkami w liczbach
+    # Zamiana znaków specjalnych poza podkreśleniami, paragrafami i kropkami w liczbach
     cleaned = re.sub(r"[^\w\s§_.-]", " ", text.lower())
-    tokens = [t.strip() for t in cleaned.split() if len(t.strip()) > 1]
+    tokens = [t.strip() for t in cleaned.split() if len(t.strip()) >= 1]
     return tokens
 
 

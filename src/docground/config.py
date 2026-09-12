@@ -18,7 +18,7 @@ class Settings(BaseModel):
     dense_top_k: int = 20
     rrf_k: int = 60
     final_top_k: int = 5
-    rejection_threshold: float = 0.30
+    rejection_threshold: float = 0.20
     chunk_size: int = 500
     chunk_overlap: int = 90
 

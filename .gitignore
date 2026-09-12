@@ -53,3 +53,4 @@ chroma_db/
 qdrant_storage/
 .cache/
 data/processed/*.index
+temp_skills/

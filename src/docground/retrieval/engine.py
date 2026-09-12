@@ -64,4 +64,10 @@ class HybridSearchEngine:
             threshold=settings.rejection_threshold
         )
 
+        # Zgodnie ze skillem rag-engineer: jeśli BM25 ma wysokie dopasowanie leksykalne
+        # (np. kod błędu, numer artykułu), traktujemy to jako wiarygodny dowód
+        has_strong_sparse_signal = any(s > 2.0 for _, s in bm25_res[:1])
+        if has_strong_sparse_signal and is_low_confidence:
+            is_low_confidence = False
+
         return reranked_res, is_low_confidence
