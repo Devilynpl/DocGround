@@ -1,0 +1,114 @@
+# DocGround: Produkcyjny RAG na Trudnym Korpusie z Weryfikowalnymi Cytowaniami
+
+**Problem:** Standardowy pipeline „naiwnego RAG-a” (prosty chunker + similarity search) kompletnie zawodzi na realnych dokumentach: ucina tabele w połowie, gubi metadane stron, myli wersje regulaminów i zmyśla cytowania.  
+**Cel:** Zbudować odporny system RAG, który odpowiada wyłącznie na podstawie faktów, podaje dokładne cytaty (plik, strona, fragment), a przy braku pewności zwraca deterministyczne „nie wiem”.  
+**Zasada przewodnia:** Eval-First Development — metryki i zbiór testowy powstają przed napisaniem jakiegokolwiek interfejsu graficznego.
+
+---
+
+## ~~Faza 1: Selekcja korpusu, taksonomia chunkingu i schemat metadanych~~
+~~Zanim model dostanie jakikolwiek tekst, musisz rozwiązać problem reprezentacji danych. Zwykły podział po 500 znakach niszczy semantykę tabel i strukturę dokumentu wielostronicowego.~~
+
+- [x] ~~**Wybór trudnego korpusu biznesowego (min. 10–20 złożonych plików):**~~
+  - ~~Odrzucenie czystego tekstu (np. artykułów z Wikipedii).~~
+  - ~~Wybór dokumentów zawierających: tabele finansowe, wielokolumnowy skład tekstu, regulaminy z numerowanymi sekcjami (np. OWU, instrukcje techniczne, dokumentacja API w HTML/PDF).~~ *(Zrealizowano 12 trudnych plików PDF w `data/raw/`)*
+- [x] ~~**Zaawansowany parser dokumentów (Layout-Aware Ingestion):**~~
+  - ~~Integracja parsera strukturalnego (pdfplumber) zdolnego do rozpoznawania nagłówków, akapitów i bloków tabelarycznych.~~
+  - ~~Ekstrakcja tabel do natywnego formatu Markdown lub HTML — modele znacznie lepiej rozumieją relacje wiersz-kolumna w sformatowanym tekście niż w płaskim ciągu tokenów.~~ *(Zrealizowano w `docground.ingest.parser`)*
+- [x] ~~**Hierarchiczny kontrakt metadanych per chunk:**~~
+  - ~~Każdy fragment tekstu musi być trwale związany z metadanymi:~~
+```python
+class DocumentChunk(BaseModel):
+    chunk_id: str             # unikalny hash (np. sha256 z treści i źródła)
+    doc_name: str             # np. regulamin_promocji_v2.pdf
+    doc_type: str             # pdf, html, sop
+    page_number: int          # numer strony fizycznej (lub sekcja HTML)
+    chunk_type: str           # text, table, header
+    content: str              # faktyczny tekst chunka
+    raw_context_anchor: str   # unikalne pierwsze i ostatnie 10 słów do weryfikacji cytatu
+```
+*(Zrealizowano w `docground.models` z Pydantic v2)*
+- [x] ~~**Strategia chunkingu semantycznego (Recursive + Table Preservation):**~~
+  - ~~Nigdy nie dziel komórek tabeli w połowie. Cała tabela stanowi pojedynczy chunk lub podtabelę z zachowanym nagłówkiem kolumn.~~
+  - ~~Chunk size: 400–600 tokenów z nakładaniem (overlap) 80–100 tokenów.~~ *(Zrealizowano w `docground.ingest.chunker`)*
+
+---
+
+## Faza 2: Eval-First — Budowa Golden Setu i metryk przed RAG-iem
+Nie budujemy retrievalu „na oko”. W tej fazie tworzysz fundament testowy, który będzie obiektywnym sędzią dla każdej zmiany algorytmu.
+
+- [ ] Przygotowanie specyficznego Golden Setu (40–60 pytań):
+  - Pytania tabelaryczne (Table QA): Pytania o konkretne komórki (np. „Jaki był zysk netto w Q3 wg tabeli 4 na stronie 12?”).
+  - Pytania wielojęzyczne / krzyżowe: Pytania po polsku do dokumentacji angielskiej (lub odwrotnie).
+  - Pytania sprzeczne temporalnie: Porównanie wersji (np. stary cennik vs nowy cennik — system musi wybrać właściwy na podstawie metadanych).
+  - Pytania spoza korpusu (Unanswerable / Out-of-Domain): Min. 20% pytań, na które w dokumentach nie ma odpowiedzi (test na deterministyczne „nie wiem”).
+- [ ] Definicja 5 kluczowych metryk (metryki sukcesu w README):
+  - Recall@K (Retrieval Recall): Czy właściwy chunk z odpowiedzią znalazł się w top K pobranych dokumentów?
+  - Faithfulness (Wierność): Brak halucynacji — czy każda informacja wynika bezpośrednio z pobranego kontekstu.
+  - Citation Precision (Precyzja cytowań): Odsetek cytowań, które rzeczywiście wskazują właściwy plik, stronę i dokładnie wspierają dane zdanie.
+  - P95 Latency: Czas generacji odpowiedzi dla 95% najtrudniejszych zapytań.
+  - Cost per 100 Queries: Całkowity koszt tokenów (embedder + LLM + reranker) na 100 wywołań.
+- [ ] Zautomatyzowany runner walidacji (CLI):
+  - Prosty skrypt `python -m docground.evaluate`, który uruchamia zbiór testowy i zwraca wyniki w tabeli terminala.
+
+---
+
+## Faza 3: Silnik wyszukiwania hybrydowego (BM25 + Dense Vectors + Cross-Encoder Reranker)
+Pojedynczy wektorowy retriever zawodzi przy nazwach własnych, numerach artykułów, kodach błędów i skrótach. Rozwiązaniem jest wyszukiwanie hybrydowe z późniejszym rerankingiem.
+
+- [ ] Baza wektorowa i model embeddingów (Dense Retrieval):
+  - Zastosowanie sprawdzonego modelu wielojęzycznego (np. text-embedding-3-small, bge-m3 lub cohere-embed-multilingual-v3.0).
+  - Przechowywanie wektorów w bazie obsługującej filtrowanie po metadanych (np. Chroma, Qdrant lub pgvector).
+- [ ] Wyszukiwanie leksykalne (Sparse Retrieval / BM25):
+  - Wdrożenie indeksu BM25 (np. rank-bm25 lub natywny BM25 w Qdrant/Elastic).
+  - Kluczowe dla zapytań precyzyjnych (np. „Art. 14 ust. 2b”, „błąd 0x8004”).
+- [ ] Fuzja rankingów (Reciprocal Rank Fusion - RRF):
+  - Połączenie wyników z BM25 (top 20) i wyszukiwania wektorowego (top 20) za pomocą algorytmu RRF:
+    $$RRF\_Score(d) = \sum_{m \in M} \frac{1}{k + rank_m(d)} \quad (k=60)$$
+- [ ] Cross-Encoder Reranker (Siewnik jakości):
+  - Przekazanie top 20 wyników po RRF do mocnego rerankera (np. bge-reranker-large lub cohere-rerank).
+  - Zwrócenie ostatecznego top 4–6 chunków o najwyższym stopniu dopasowania semantycznego.
+- [ ] Dynamiczny próg odrzucenia (Rejection Threshold):
+  - Jeśli najwyższy wynik z rerankera jest niższy od zdefiniowanego progu (np. score < 0.35), proces retrievalu zostaje oznaczony flagą low_confidence. Zapobiega to karmieniu LLM-a losowym szumem.
+
+---
+
+## Faza 4: Synteza z restrykcyjnymi cytowaniami i mechanizmem „Nie wiem”
+Model językowy nie może prowadzić swobodnej rozmowy — działa jako restrykcyjny silnik kompilacji faktów.
+
+- [ ] Rygorystyczny System Prompt dla syntezy:
+  - Zasada Zero-Assumption: Zakaz używania wiedzy zewnętrznej.
+  - Zasada Brak danych = odmowa: Jeżeli w kontekście brak jednoznacznej odpowiedzi, model ma obowiązek zwrócić: „Na podstawie dostarczonej dokumentacji nie jestem w stanie odpowiedzieć na to pytanie.”
+  - Format wymuszonego cytowania: Każde twierdzenie musi kończyć się znacznikiem referencyjnym w formacie: `[[źródło: nazwa_pliku, s. numer_strony]]`.
+- [ ] Weryfikator cytowań post-processing (Citation Validator):
+  - Automatyczny skrypt sprawdzający, czy cytowane przez model pliki i strony rzeczywiście znajdowały się w przekazanym mu kontekście.
+  - Odrzucanie i ponawianie generacji, jeśli model sfabrykował numer strony.
+- [ ] Kontrakt wyjściowy odpowiedzi (Structured / Streamed Engine):
+  - Przygotowanie asynchronicznego generatora tokenów ze zwracaniem ustrukturyzowanych metadanych o użytych źródłach na końcu strumienia:
+```python
+class GroundedResponse(BaseModel):
+    answer: str
+    is_confident: bool
+    sources: List[SourceReference] # plik, strona, fragment tekstu bazowego
+```
+
+---
+
+## Faza 5: Interfejs ze streamingiem i publikacja metryk w README
+Dopiero gdy system ma udowodniony brak halucynacji i precyzyjne cytowania, opakowujemy go w warstwę prezentacyjną.
+
+- [ ] Interfejs użytkownika z podglądem źródeł (FastHTML / Streamlit / Chainlit):
+  - Obsługa strumieniowania tokenów w czasie rzeczywistym (Real-time Token Streaming).
+  - Klikalne referencje cytatów: kliknięcie w `[[regulamin.pdf, s. 4]]` otwiera boczny panel (drawer) z oryginalnym fragmentem tekstu lub wyrenderowaną tabelą z tego dokumentu.
+  - Wyraźna etykieta wizualna dla odpowiedzi typu „Brak informacji w dokumentacji” (odróżniająca błąd systemu od świadomej odmowy).
+- [ ] Finalna weryfikacja i wpis w README:
+  - Wygenerowanie raportu końcowego za pomocą eval runnera z Fazy 2.
+  - Wypełnienie sekcji Benchmarks & Metrics w pliku README.md:
+
+| Metryka | Wynik Baseline (Naiwny RAG) | Wynik DocGround (Hybrid + Rerank) |
+| :--- | :---: | :---: |
+| **Retrieval Recall@5** | 62.5% | **94.2%** |
+| **Faithfulness (Brak halucynacji)** | 71.0% | **98.0%** |
+| **Citation Precision** | 45.0% | **92.5%** |
+| **P95 Latency** | 1100 ms | 1850 ms (+750 ms z rerankerem) |
+| **Koszt / 100 zapytań** | $0.08 | $0.14 |
