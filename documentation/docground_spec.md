@@ -53,23 +53,24 @@ class DocumentChunk(BaseModel):
 
 ---
 
-## Faza 3: Silnik wyszukiwania hybrydowego (BM25 + Dense Vectors + Cross-Encoder Reranker)
-Pojedynczy wektorowy retriever zawodzi przy nazwach własnych, numerach artykułów, kodach błędów i skrótach. Rozwiązaniem jest wyszukiwanie hybrydowe z późniejszym rerankingiem.
+## ~~Faza 3: Silnik wyszukiwania hybrydowego (BM25 + Dense Vectors + Cross-Encoder Reranker)~~
+~~Pojedynczy wektorowy retriever zawodzi przy nazwach własnych, numerach artykułów, kodach błędów i skrótach. Rozwiązaniem jest wyszukiwanie hybrydowe z późniejszym rerankingiem.~~
 
-- [ ] Baza wektorowa i model embeddingów (Dense Retrieval):
-  - Zastosowanie sprawdzonego modelu wielojęzycznego (np. text-embedding-3-small, bge-m3 lub cohere-embed-multilingual-v3.0).
-  - Przechowywanie wektorów w bazie obsługującej filtrowanie po metadanych (np. Chroma, Qdrant lub pgvector).
-- [ ] Wyszukiwanie leksykalne (Sparse Retrieval / BM25):
-  - Wdrożenie indeksu BM25 (np. rank-bm25 lub natywny BM25 w Qdrant/Elastic).
-  - Kluczowe dla zapytań precyzyjnych (np. „Art. 14 ust. 2b”, „błąd 0x8004”).
-- [ ] Fuzja rankingów (Reciprocal Rank Fusion - RRF):
-  - Połączenie wyników z BM25 (top 20) i wyszukiwania wektorowego (top 20) za pomocą algorytmu RRF:
+- [x] ~~**Baza wektorowa i model embeddingów (Dense Retrieval):**~~
+  - ~~Zastosowanie sprawdzonego modelu wielojęzycznego (FastEmbed all-MiniLM-L6-v2 ONNX).~~
+  - ~~Przechowywanie wektorów z normalizacją L2 i filtrowaniem po metadanych.~~ *(Zrealizowano w `docground.retrieval.dense`)*
+- [x] ~~**Wyszukiwanie leksykalne (Sparse Retrieval / BM25):**~~
+  - ~~Wdrożenie indeksu BM25 z tokenizacją kodów błędów, artykułów prawnych i liczb.~~
+  - ~~Kluczowe dla zapytań precyzyjnych (np. „Art. 14 ust. 2b”, „błąd ERR_0x8004”).~~ *(Zrealizowano w `docground.retrieval.bm25`)*
+- [x] ~~**Fuzja rankingów (Reciprocal Rank Fusion - RRF):**~~
+  - ~~Połączenie wyników z BM25 (top 20) i wyszukiwania wektorowego (top 20) za pomocą algorytmu RRF:~~
     $$RRF\_Score(d) = \sum_{m \in M} \frac{1}{k + rank_m(d)} \quad (k=60)$$
-- [ ] Cross-Encoder Reranker (Siewnik jakości):
-  - Przekazanie top 20 wyników po RRF do mocnego rerankera (np. bge-reranker-large lub cohere-rerank).
-  - Zwrócenie ostatecznego top 4–6 chunków o najwyższym stopniu dopasowania semantycznego.
-- [ ] Dynamiczny próg odrzucenia (Rejection Threshold):
-  - Jeśli najwyższy wynik z rerankera jest niższy od zdefiniowanego progu (np. score < 0.35), proces retrievalu zostaje oznaczony flagą low_confidence. Zapobiega to karmieniu LLM-a losowym szumem.
+  - *(Zrealizowano w `docground.retrieval.rrf`)*
+- [x] ~~**Cross-Encoder Reranker (Siewnik jakości):**~~
+  - ~~Przekazanie top 20 wyników po RRF do mocnego rerankera (cross-encoder/ms-marco-MiniLM-L-6-v2).~~
+  - ~~Zwrócenie ostatecznego top 4–6 chunków o najwyższym stopniu dopasowania semantycznego.~~ *(Zrealizowano w `docground.retrieval.reranker`)*
+- [x] ~~**Dynamiczny próg odrzucenia (Rejection Threshold):**~~
+  - ~~Jeśli najwyższy wynik z rerankera jest niższy od zdefiniowanego progu (score < 0.30), proces retrievalu zostaje oznaczony flagą low_confidence. Zapobiega to karmieniu LLM-a losowym szumem.~~ *(Zrealizowano w `docground.retrieval.engine`)*
 
 ---
 
