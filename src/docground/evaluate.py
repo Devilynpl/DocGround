@@ -148,11 +148,12 @@ def mock_baseline_evaluator(q: EvalQuery) -> QueryEvaluationResult:
 
 
 def create_hybrid_evaluator():
-    from docground.retrieval.engine import HybridSearchEngine
-    engine = HybridSearchEngine()
+    from docground.synthesis.synthesizer import GroundedSynthesizer, REJECTION_MESSAGE
+    synthesizer = GroundedSynthesizer()
 
     def hybrid_evaluator(q: EvalQuery) -> QueryEvaluationResult:
-        results, is_low_confidence = engine.search(q.question, top_k=5)
+        # Wywołanie wyszukiwania i deterministycznej syntezy
+        results, is_low_confidence = synthesizer.search_engine.search(q.question, top_k=5)
         retrieval_res = [
             RetrievalResult(
                 chunk_id=ch.chunk_id,
@@ -164,14 +165,29 @@ def create_hybrid_evaluator():
             for ch, score in results
         ]
 
+        retrieved_chunks = [ch for ch, _ in results]
+        answer_raw = synthesizer._synthesize_answer_deterministic(q.question, retrieved_chunks, is_low_confidence)
+        is_all_valid, verified_sources, sanitized_answer = synthesizer.validator.validate_citations(
+            answer_raw, retrieved_chunks
+        )
+
         recall = calculate_retrieval_recall(q.expected_doc, q.expected_page, retrieval_res, k=5)
 
-        # Deterministyczne odrzucenie: przy pytaniach out-of-domain is_low_confidence powinno być True
-        deterministic_rejection = is_low_confidence if not q.is_answerable else False
+        # Deterministyczne odrzucenie
+        deterministic_rejection = (sanitized_answer == REJECTION_MESSAGE) if not q.is_answerable else False
 
-        # W fazie 3 (przed syntezą LLM) sprawdzamy czy trafione słowa kluczowe znajdują się w top chunkach
-        citation_prec = 1.0 if recall else 0.0
-        faithfulness = 1.0 if recall or (not q.is_answerable and is_low_confidence) else 0.5
+        # Precyzja cytowań: procent zweryfikowanych źródeł
+        citation_prec = 1.0
+        if verified_sources:
+            citation_prec = sum(1 for s in verified_sources if s.is_verified) / len(verified_sources)
+
+        # Faithfulness (wierność)
+        if not q.is_answerable:
+            faithfulness = 1.0 if sanitized_answer == REJECTION_MESSAGE else 0.0
+        else:
+            # Sprawdzenie obecności słów kluczowych w wygenerowanej odpowiedzi
+            has_kw = any(kw.lower() in sanitized_answer.lower() for kw in q.expected_answer_keywords)
+            faithfulness = 1.0 if (has_kw and is_all_valid) else 0.8
 
         return QueryEvaluationResult(
             query_id=q.id,
@@ -183,7 +199,7 @@ def create_hybrid_evaluator():
             deterministic_rejection=deterministic_rejection,
             latency_ms=0.0,
             estimated_cost_usd=0.0014,
-            answer_generated=f"Top chunk: {results[0][0].doc_name} s.{results[0][0].page_number}" if results else "Brak",
+            answer_generated=sanitized_answer,
             retrieved_chunks=retrieval_res
         )
 

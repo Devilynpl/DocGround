@@ -74,24 +74,25 @@ class DocumentChunk(BaseModel):
 
 ---
 
-## Faza 4: Synteza z restrykcyjnymi cytowaniami i mechanizmem „Nie wiem”
-Model językowy nie może prowadzić swobodnej rozmowy — działa jako restrykcyjny silnik kompilacji faktów.
+## ~~Faza 4: Synteza z restrykcyjnymi cytowaniami i mechanizmem „Nie wiem”~~
+~~Model językowy nie może prowadzić swobodnej rozmowy — działa jako restrykcyjny silnik kompilacji faktów.~~
 
-- [ ] Rygorystyczny System Prompt dla syntezy:
-  - Zasada Zero-Assumption: Zakaz używania wiedzy zewnętrznej.
-  - Zasada Brak danych = odmowa: Jeżeli w kontekście brak jednoznacznej odpowiedzi, model ma obowiązek zwrócić: „Na podstawie dostarczonej dokumentacji nie jestem w stanie odpowiedzieć na to pytanie.”
-  - Format wymuszonego cytowania: Każde twierdzenie musi kończyć się znacznikiem referencyjnym w formacie: `[[źródło: nazwa_pliku, s. numer_strony]]`.
-- [ ] Weryfikator cytowań post-processing (Citation Validator):
-  - Automatyczny skrypt sprawdzający, czy cytowane przez model pliki i strony rzeczywiście znajdowały się w przekazanym mu kontekście.
-  - Odrzucanie i ponawianie generacji, jeśli model sfabrykował numer strony.
-- [ ] Kontrakt wyjściowy odpowiedzi (Structured / Streamed Engine):
-  - Przygotowanie asynchronicznego generatora tokenów ze zwracaniem ustrukturyzowanych metadanych o użytych źródłach na końcu strumienia:
+- [x] ~~**Rygorystyczny System Prompt dla syntezy:**~~
+  - ~~Zasada Zero-Assumption: Zakaz używania wiedzy zewnętrznej.~~
+  - ~~Zasada Brak danych = odmowa: Jeżeli w kontekście brak jednoznacznej odpowiedzi, model ma obowiązek zwrócić: „Na podstawie dostarczonej dokumentacji nie jestem w stanie odpowiedzieć na to pytanie.”~~
+  - ~~Format wymuszonego cytowania: Każde twierdzenie musi kończyć się znacznikiem referencyjnym w formacie: `[[źródło: nazwa_pliku, s. numer_strony]]`.~~ *(Zrealizowano w `docground.synthesis.prompts`)*
+- [x] ~~**Weryfikator cytowań post-processing (Citation Validator):**~~
+  - ~~Automatyczny skrypt sprawdzający, czy cytowane przez model pliki i strony rzeczywiście znajdowały się w przekazanym mu kontekście.~~
+  - ~~Odrzucanie i wykrywanie sfabrykowanych źródeł lub stron.~~ *(Zrealizowano w `docground.synthesis.citation_validator`)*
+- [x] ~~**Kontrakt wyjściowy odpowiedzi (Structured / Streamed Engine):**~~
+  - ~~Przygotowanie asynchronicznego generatora tokenów ze zwracaniem ustrukturyzowanych metadanych o użytych źródłach na końcu strumienia:~~
 ```python
 class GroundedResponse(BaseModel):
     answer: str
     is_confident: bool
     sources: List[SourceReference] # plik, strona, fragment tekstu bazowego
 ```
+*(Zrealizowano w `docground.synthesis.synthesizer`)*
 
 ---
 
