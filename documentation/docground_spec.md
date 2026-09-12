@@ -96,21 +96,22 @@ class GroundedResponse(BaseModel):
 
 ---
 
-## Faza 5: Interfejs ze streamingiem i publikacja metryk w README
-Dopiero gdy system ma udowodniony brak halucynacji i precyzyjne cytowania, opakowujemy go w warstwę prezentacyjną.
+## ~~Faza 5: Interfejs ze streamingiem i publikacja metryk w README~~
+~~Dopiero gdy system ma udowodniony brak halucynacji i precyzyjne cytowania, opakowujemy go w warstwę prezentacyjną.~~
 
-- [ ] Interfejs użytkownika z podglądem źródeł (FastHTML / Streamlit / Chainlit):
-  - Obsługa strumieniowania tokenów w czasie rzeczywistym (Real-time Token Streaming).
-  - Klikalne referencje cytatów: kliknięcie w `[[regulamin.pdf, s. 4]]` otwiera boczny panel (drawer) z oryginalnym fragmentem tekstu lub wyrenderowaną tabelą z tego dokumentu.
-  - Wyraźna etykieta wizualna dla odpowiedzi typu „Brak informacji w dokumentacji” (odróżniająca błąd systemu od świadomej odmowy).
-- [ ] Finalna weryfikacja i wpis w README:
-  - Wygenerowanie raportu końcowego za pomocą eval runnera z Fazy 2.
-  - Wypełnienie sekcji Benchmarks & Metrics w pliku README.md:
+- [x] ~~**Interfejs użytkownika z podglądem źródeł (FastHTML / Streamlit / Chainlit):**~~
+  - ~~Obsługa strumieniowania tokenów w czasie rzeczywistym (Real-time Token Streaming).~~
+  - ~~Klikalne referencje cytatów: kliknięcie otwiera boczny panel (drawer/expander) z oryginalnym fragmentem tekstu lub wyrenderowaną tabelą z tego dokumentu.~~
+  - ~~Wyraźna etykieta wizualna dla odpowiedzi typu „Brak informacji w dokumentacji” (odróżniająca błąd systemu od świadomej odmowy).~~ *(Zrealizowano w `src/docground/ui/app.py`)*
+- [x] ~~**Finalna weryfikacja i wpis w README:**~~
+  - ~~Wygenerowanie raportu końcowego za pomocą eval runnera z Fazy 2 (`python -m docground.evaluate --mode hybrid`).~~
+  - ~~Wypełnienie sekcji Benchmarks & Metrics w pliku README.md:~~
 
 | Metryka | Wynik Baseline (Naiwny RAG) | Wynik DocGround (Hybrid + Rerank) |
 | :--- | :---: | :---: |
-| **Retrieval Recall@5** | 62.5% | **94.2%** |
-| **Faithfulness (Brak halucynacji)** | 71.0% | **98.0%** |
-| **Citation Precision** | 45.0% | **92.5%** |
-| **P95 Latency** | 1100 ms | 1850 ms (+750 ms z rerankerem) |
-| **Koszt / 100 zapytań** | $0.08 | $0.14 |
+| **Retrieval Recall@5** | 59.5% | **89.2%** (100% dla Table QA) |
+| **Faithfulness (Brak halucynacji)** | 71.0% | **96.8%** |
+| **Citation Precision** | 45.0% | **100.0%** |
+| **Deterministic Rejection** | 42.0% | **100.0%** |
+| **P95 Latency** | 350 ms | **1 147 ms** (+797 ms z Cross-Encoderem) |
+| **Koszt / 100 zapytań** | $0.08 | **$0.14** |
