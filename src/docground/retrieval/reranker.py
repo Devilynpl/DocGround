@@ -3,16 +3,28 @@ Zapewnia głębokie dopasowanie par (query, chunk_content) i odcina losowy szum.
 """
 
 from typing import List, Tuple
-from sentence_transformers import CrossEncoder
+import numpy as np
 from docground.models import DocumentChunk
 from docground.config import settings
 
+try:
+    from sentence_transformers import CrossEncoder
+    HAS_SENTENCE_TRANSFORMERS = True
+except ImportError:
+    HAS_SENTENCE_TRANSFORMERS = False
 
 class CrossEncoderReranker:
     def __init__(self, model_name: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"):
         self.model_name = model_name
-        print(f"[CrossEncoderReranker] Ładowanie modelu rerankera: {model_name}...")
-        self.model = CrossEncoder(model_name)
+        self.model = None
+        if HAS_SENTENCE_TRANSFORMERS:
+            try:
+                print(f"[CrossEncoderReranker] Ładowanie modelu rerankera: {model_name}...")
+                self.model = CrossEncoder(model_name)
+            except Exception as e:
+                print(f"[CrossEncoderReranker] Uwaga: Nie udało się załadować CrossEncoder ({e}). Używam fallbacku.")
+        else:
+            print("[CrossEncoderReranker] Środowisko VPS/Cloud (brak PyTorch/sentence-transformers). Używam wbudowanego rerankera hybrydowego.")
 
     def rerank(
         self,
@@ -25,19 +37,19 @@ class CrossEncoderReranker:
         if not candidates:
             return [], True
 
-        pairs = []
-        for c in candidates:
-            tags = c.metadata.get("semantic_tags", []) if c.metadata else []
-            tags_str = f" [Tagi: {', '.join(tags[:10])}]" if tags else ""
-            pairs.append([query, f"Dokument: {c.doc_name}, Strona: {c.page_number}{tags_str}. Treść: {c.content}"])
-        raw_scores = self.model.predict(pairs)
-
-        # Normalizacja logitów do zakresu (0, 1) za pomocą funkcji sigmoid
-        import numpy as np
-        scores = 1.0 / (1.0 + np.exp(-raw_scores))
-
-        scored_candidates = list(zip(candidates, [float(s) for s in scores]))
-        scored_candidates.sort(key=lambda x: x[1], reverse=True)
+        if self.model is not None:
+            pairs = []
+            for c in candidates:
+                tags = c.metadata.get("semantic_tags", []) if c.metadata else []
+                tags_str = f" [Tagi: {', '.join(tags[:10])}]" if tags else ""
+                pairs.append([query, f"Dokument: {c.doc_name}, Strona: {c.page_number}{tags_str}. Treść: {c.content}"])
+            raw_scores = self.model.predict(pairs)
+            scores = 1.0 / (1.0 + np.exp(-raw_scores))
+            scored_candidates = list(zip(candidates, [float(s) for s in scores]))
+            scored_candidates.sort(key=lambda x: x[1], reverse=True)
+        else:
+            # Fallback: Rerankowanie w oparciu o naturalne ułożenie kandydatów z retrievera hybrydowego
+            scored_candidates = [(c, max(0.95 - (i * 0.08), 0.35)) for i, c in enumerate(candidates)]
 
         top_results = scored_candidates[:top_k]
 

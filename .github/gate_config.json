@@ -1,0 +1,8 @@
+{
+  "min_faithfulness": 0.95,
+  "min_citation_precision": 0.90,
+  "require_deterministic_refusal": true,
+  "max_critical_regressions": 0,
+  "max_p95_latency_ms": 2500.0,
+  "max_p95_latency_increase_ms": 250.0
+}

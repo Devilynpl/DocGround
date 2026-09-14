@@ -23,7 +23,7 @@ RUN pip install --no-cache-dir \
         torch torchvision
 
 # Step 3: Install the package and all remaining deps
-RUN pip install --no-cache-dir -e .
+RUN pip install --no-cache-dir -r requirements.txt && pip install --no-cache-dir -e .
 
 COPY data/processed/ ./data/processed/
 COPY DocGroundAI_logo.jpg ./

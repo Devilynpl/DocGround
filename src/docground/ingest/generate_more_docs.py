@@ -14,23 +14,26 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
 from docground.config import RAW_DATA_DIR
+from docground.ingest.font_utils import register_polish_fonts
 
 
 def generate_additional_documents():
     RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
+    font_name = register_polish_fonts()
+    font_bold = f"{font_name}-Bold" if font_name == "Arial" else "Helvetica-Bold"
     styles = getSampleStyleSheet()
 
     title_style = ParagraphStyle(
-        'DocTitle', parent=styles['Heading1'], fontSize=17, leading=21, textColor=colors.HexColor("#1A365D"), spaceAfter=10
+        'DocTitle', parent=styles['Heading1'], fontName=font_bold, fontSize=17, leading=21, textColor=colors.HexColor("#1A365D"), spaceAfter=10
     )
     h2_style = ParagraphStyle(
-        'DocH2', parent=styles['Heading2'], fontSize=13, leading=17, textColor=colors.HexColor("#2B6CB0"), spaceBefore=8, spaceAfter=5
+        'DocH2', parent=styles['Heading2'], fontName=font_bold, fontSize=13, leading=17, textColor=colors.HexColor("#2B6CB0"), spaceBefore=8, spaceAfter=5
     )
     body_style = ParagraphStyle(
-        'DocBody', parent=styles['Normal'], fontSize=9.5, leading=13.5, textColor=colors.HexColor("#2D3748"), spaceAfter=5
+        'DocBody', parent=styles['Normal'], fontName=font_name, fontSize=9.5, leading=13.5, textColor=colors.HexColor("#2D3748"), spaceAfter=5
     )
     legal_style = ParagraphStyle(
-        'LegalBody', parent=styles['Normal'], fontSize=9, leading=13, textColor=colors.HexColor("#1A202C"), spaceAfter=4
+        'LegalBody', parent=styles['Normal'], fontName=font_name, fontSize=9, leading=13, textColor=colors.HexColor("#1A202C"), spaceAfter=4
     )
 
     # 7. Regulamin Płatności i Prowizji (regulamin_platnosci_v2.pdf)

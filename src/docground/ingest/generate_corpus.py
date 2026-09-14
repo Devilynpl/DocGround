@@ -12,16 +12,20 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
 from docground.config import RAW_DATA_DIR
+from docground.ingest.font_utils import register_polish_fonts
 
 
 def generate_all_documents():
     RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
+    font_name = register_polish_fonts()
+    font_bold = f"{font_name}-Bold" if font_name == "Arial" else "Helvetica-Bold"
     styles = getSampleStyleSheet()
 
     # Stylistyka
     title_style = ParagraphStyle(
         'DocTitle',
         parent=styles['Heading1'],
+        fontName=font_bold,
         fontSize=18,
         leading=22,
         textColor=colors.HexColor("#1A365D"),
@@ -30,6 +34,7 @@ def generate_all_documents():
     h2_style = ParagraphStyle(
         'DocH2',
         parent=styles['Heading2'],
+        fontName=font_bold,
         fontSize=14,
         leading=18,
         textColor=colors.HexColor("#2B6CB0"),
@@ -39,6 +44,7 @@ def generate_all_documents():
     body_style = ParagraphStyle(
         'DocBody',
         parent=styles['Normal'],
+        fontName=font_name,
         fontSize=10,
         leading=14,
         textColor=colors.HexColor("#2D3748"),
@@ -47,6 +53,7 @@ def generate_all_documents():
     legal_style = ParagraphStyle(
         'LegalBody',
         parent=styles['Normal'],
+        fontName=font_name,
         fontSize=9,
         leading=13,
         textColor=colors.HexColor("#1A202C"),
@@ -87,7 +94,7 @@ def generate_all_documents():
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#2B6CB0")),
         ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
         ('ALIGN', (1,0), (-1,-1), 'CENTER'),
-        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('FONTNAME', (0,0), (-1,0), font_bold),
         ('FONTSIZE', (0,0), (-1,0), 9),
         ('BOTTOMPADDING', (0,0), (-1,0), 5),
         ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor("#CBD5E0")),
@@ -122,10 +129,10 @@ def generate_all_documents():
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#2C5282")),
         ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
         ('ALIGN', (1,0), (-1,-1), 'CENTER'),
-        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('FONTNAME', (0,0), (-1,0), font_bold),
         ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor("#CBD5E0")),
         ('BACKGROUND', (0,-1), (-1,-1), colors.HexColor("#E2E8F0")),
-        ('FONTNAME', (0,-1), (-1,-1), 'Helvetica-Bold')
+        ('FONTNAME', (0,-1), (-1,-1), font_bold)
     ]))
     story1.append(t2)
     story1.append(Spacer(1, 15))
@@ -172,7 +179,7 @@ def generate_all_documents():
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#742A2A")),
         ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
         ('FONTSIZE', (0,0), (-1,0), 8.5),
-        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('FONTNAME', (0,0), (-1,0), font_bold),
         ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor("#CBD5E0")),
         ('ALIGN', (1,0), (-1,-1), 'CENTER'),
         ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.HexColor("#FFF5F5"), colors.white])
@@ -285,7 +292,7 @@ def generate_all_documents():
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#553C9A")),
         ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
         ('FONTSIZE', (0,0), (-1,0), 8.5),
-        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('FONTNAME', (0,0), (-1,0), font_bold),
         ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor("#CBD5E0")),
         ('ALIGN', (0,0), (1,-1), 'CENTER')
     ]))
@@ -325,7 +332,7 @@ def generate_all_documents():
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#9B2C2C")),
         ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
         ('FONTSIZE', (0,0), (-1,0), 8),
-        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('FONTNAME', (0,0), (-1,0), font_bold),
         ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor("#CBD5E0")),
         ('ALIGN', (0,0), (0,-1), 'CENTER')
     ]))

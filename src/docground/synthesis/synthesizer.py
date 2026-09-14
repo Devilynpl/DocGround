@@ -1,7 +1,6 @@
 """Synthesizer Engine:
 Wspiera asynchroniczną syntezę ze streamingiem tokenów, deterministyczną odmową na progu odrzucenia
 oraz automatyczną weryfikacją cytowań przed zwróceniem GroundedResponse.
-Zawiera wbudowany deterministyczny generator faktograficzny (offline rule engine / LLM wrapper).
 """
 
 import asyncio
@@ -55,121 +54,6 @@ class GroundedSynthesizer:
             except Exception as e:
                 print(f"[GroundedSynthesizer] Ostrzeżenie: nie udało się zainicjalizować Llama: {e}")
                 self.llm = None
-
-    def _synthesize_answer_deterministic(
-        self,
-        query: str,
-        chunks: List[DocumentChunk],
-        is_low_confidence: bool
-    ) -> str:
-        """Deterministyczna synteza odpowiedzi faktograficznej z wymuszonymi cytowaniami."""
-        if is_low_confidence or not chunks:
-            return REJECTION_MESSAGE
-
-        top_chunk = chunks[0]
-        q_lower = query.lower()
-
-        # Ekstrakcja kluczowych faktów z tabel i tekstu na podstawie pytania
-        def find_chunk_matching(doc_sub: str, page: int = 1) -> DocumentChunk:
-            for ch in chunks:
-                if doc_sub.lower() in ch.doc_name.lower():
-                    return ch
-            return top_chunk
-
-        # 1. OWU
-        if "pojazd" in q_lower and ("franszyza" in q_lower or "udział własny" in q_lower):
-            return f"Dla kradzieży sprzętu z pojazdu udział własny (franszyza redukcyjna) wynosi 1 500 PLN [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-        if "zalani" in q_lower and "zgłoszeni" in q_lower:
-            return f"Maksymalny czas zgłoszenia zalania sprzętu elektronicznego to 3 dni robocze [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-
-        # 3. Regulamin Płatności
-        if "marża novapay" in q_lower or ("debetow" in q_lower and "marża" in q_lower):
-            return f"Marża NovaPay dla kart debetowych Visa/Mastercard (PL) wynosi 0.45% + 0.10 PLN [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-        if "blik standard" in q_lower:
-            return f"Łączny szacunkowy koszt transakcji BLIK Standard wynosi 0.69% [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-
-        # 4. FraudGuard
-        if "61 - 85" in q_lower or "manual_review" in q_lower:
-            return f"Przy ocenie 61 - 85 pkt automatyczną akcją jest MANUAL_REVIEW_QUEUE (wstrzymanie wypłaty na 6 godzin do weryfikacji) [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-        if "26 - 60" in q_lower or "3ds2" in q_lower:
-            return f"Dla punktacji 26 - 60 pkt wymagane jest uwierzytelnienie CHALLENGE_3DS2 (3D-Secure 2.2 z biometrią) [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-        if "velocity check" in q_lower:
-            return f"Reguła Velocity Check automatycznie dodaje +45 pkt do oceny ryzyka transakcji [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-
-        # 5. SLA i DR
-        if "tier 1" in q_lower and "rto" in q_lower:
-            return f"Wskaźnik Recovery Time Objective (RTO) dla Tier 1 (Core) wynosi maksymalnie 60 sekund [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-        if "tier 2" in q_lower and "rpo" in q_lower:
-            return f"Wskaźnik Recovery Point Objective (RPO) dla Tier 2 wynosi do 15 minut [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-
-        # 6. SOP Cyber Security
-        if "krytyczny (p1)" in q_lower or ("p1" in q_lower and "czas reakcji" in q_lower):
-            return f"Czas reakcji zespołu CERT dla poziomu P1 wynosi maksymalnie 15 minut [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-        if "uodo" in q_lower and "p1" in q_lower:
-            return f"Powiadomienie Prezesa UODO przy incydencie P1 musi nastąpić w ciągu 24 godzin [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-        if "klucze szyfrujące" in q_lower or "rotowa" in q_lower:
-            return f"Klucze szyfrujące podlegają rotacji w cyklu 90-dniowym z wykorzystaniem modułu Thales Luna HSM [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-
-        # 7. API Gateway
-        if "err_0x8004" in q_lower:
-            return f"Kod błędu ERR_0x8004 zwraca status HTTP 422 Unprocessable (INSUFFICIENT_FUNDS_RESERVE - stan konta powierniczego poniżej progu) i nie należy go ponawiać automatycznie [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-        if "rate limit" in q_lower or "limit zapytań" in q_lower:
-            return f"Domyślny rate limit wynosi 2 500 requests per minute na blok IP CIDR [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-
-        # 8. Webhooki
-        if "podpis" in q_lower and "webhook" in q_lower:
-            return f"Webhooki podpisywane są algorytmem HMAC-SHA512 i przekazywane w nagłówku X-Nova-Signature-V2 [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-        if "3. próbie" in q_lower or "próba 3" in q_lower:
-            return f"Przy 3. próbie doręczenia opóźnienie wynosi 2 minuty (skumulowany czas: 2m 15s) [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-
-        # 9. Audyt PCI-DSS
-        if "aoc" in q_lower or ("pci-dss" in q_lower and "ważn" in q_lower):
-            return f"Certyfikat AOC PCI-DSS wydano z datą ważności do 14 października 2026 r. (nr QSA-PL-2025-8841) [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-        if "wymóg 8" in q_lower or "uwierzytelnianie wieloskładnikowe" in q_lower:
-            return f"Zgodnie z wymogiem 8 wdrożono klucze sprzętowe FIDO2/WebAuthn dla personelu [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-
-        # 10. Partnerzy
-        if "gold partner" in q_lower:
-            return f"Prowizja Revenue Share dla Gold Partnera wynosi 15.0% z marży netto [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-
-        # 11. Cenniki Temporal (v1 vs v2)
-        if "standard cloud vm" in q_lower and ("2025" in q_lower or "v2" in q_lower):
-            ch_target = find_chunk_matching("cennik_cloud_v2_2025.pdf")
-            return f"W aktualnym cenniku 2025 (v2) cena Standard Cloud VM wynosi 189 PLN netto miesięcznie [[źródło: {ch_target.doc_name}, s. {ch_target.page_number}]]."
-        if "standard cloud vm" in q_lower and ("2024" in q_lower or "v1" in q_lower):
-            ch_target = find_chunk_matching("cennik_cloud_v1_2024.pdf")
-            return f"W cenniku z 2024 roku (v1) cena Standard Cloud VM wynosiła 149 PLN netto miesięcznie [[źródło: {ch_target.doc_name}, s. {ch_target.page_number}]]."
-        if "business scale vm" in q_lower and "pojemność" in q_lower:
-            return f"Pojemność SSD NVMe dla Business Scale VM wynosi 600 GB w cenniku 2025 (v2) w porównaniu do 500 GB w wersji 2024 (v1) [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-        if "gpu" in q_lower or "ai inference" in q_lower:
-            return f"Nową usługą w cenniku 2025 jest AI Inference GPU Node (64 GB / 8 vCPU + A10G, 1000 GB SSD) w cenie 2 890 PLN [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-        if "sla" in q_lower and ("cennik" in q_lower or "roczny" in q_lower):
-            return f"Roczny wskaźnik SLA w nowym cenniku 2025 został podniesiony z 99.9% do 99.99% w klastrach Multi-AZ [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-        if "nadmiarowy transfer" in q_lower and "2025" in q_lower:
-            return f"Cena za nadmiarowy transfer 1 TB w cenniku 2025 wynosi 10 PLN [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-        if "nadmiarowy transfer" in q_lower and "2024" in q_lower:
-            return f"Cena za nadmiarowy transfer 1 TB w cenniku 2024 wynosiła 15 PLN [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-        if "managed postgresql" in q_lower and ("specyfikacj" in q_lower or "ram" in q_lower) and "2025" in q_lower:
-            return f"W cenniku 2025 (v2) Managed PostgreSQL posiada 32 GB RAM / 8 vCPU oraz 500 GB SSD [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-        if "managed postgresql" in q_lower and ("specyfikacj" in q_lower or "ram" in q_lower) and "2024" in q_lower:
-            return f"W starym cenniku 2024 Managed PostgreSQL posiadał 16 GB RAM / 4 vCPU oraz 250 GB SSD [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-        if "support l2" in q_lower or ("czas reakcji" in q_lower and "cennik" in q_lower):
-            return f"Czas reakcji Support L2 wynosi 30 minut 24/7/365 w cenniku 2025 w porównaniu do 4 godzin w dni robocze w 2024 r. [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-        if "managed postgresql" in q_lower and "2025" in q_lower:
-            return f"Cena abonamentowa Managed PostgreSQL w cenniku 2025 wynosi 450 PLN netto [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-        if "managed postgresql" in q_lower and "2024" in q_lower:
-            return f"Cena archiwalna Managed PostgreSQL w cenniku 2024 wynosiła 320 PLN netto [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-
-        # 12. Publikacje Naukowe (dataset/)
-        if "choice irrationality" in q_lower or "irrationality" in q_lower:
-            return f"The paper proposes an axiomatic measure of choice irrationality based on opposite judgements and pairwise preferences [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-        if "popularity trap" in q_lower:
-            return f"The popularity trap describes an equilibrium where users strategically post popular opinions rather than authentic ones, leading to welfare losses [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-        if "dial-a-ride" in q_lower or "synchronized visits" in q_lower:
-            return f"The Dial-a-Ride problem with synchronized visits addresses coordinated vehicle routing under strict timing and availability constraints [[źródło: {top_chunk.doc_name}, s. {top_chunk.page_number}]]."
-
-        # Jeśli brak bezpośredniego dopasowania faktograficznego, zwróć bezpieczną odmowę
-        return REJECTION_MESSAGE
 
     async def generate_response_stream(
         self,
@@ -226,8 +110,9 @@ class GroundedSynthesizer:
 
         # 3. Synteza: Gemini Flash API (priorytet, gdy podany klucz), Local Qwen LLM lub deterministyczny offline engine
         answer_raw = ""
+        last_error = ""
         gemini_key = getattr(settings, "gemini_api_key", "") or os.getenv("GEMINI_API_KEY", "")
-        active_engine = "Gemini 3.1 Flash-Lite" if gemini_key else ("Local Qwen2.5-3B" if self.use_local_llm else "Offline Rule Engine")
+        active_engine = "Gemini 3.1 Flash-Lite" if gemini_key else ("Local Qwen2.5-3B" if self.use_local_llm else "No LLM Configured")
 
         yield {
             "type": "flow_step",
@@ -256,7 +141,11 @@ class GroundedSynthesizer:
                 req_gate = urllib.request.Request(
                     tollgate_url,
                     data=json.dumps(payload_gate).encode("utf-8"),
-                    headers={"Content-Type": "application/json"}
+                    headers={
+                        "Content-Type": "application/json",
+                        # SECURITY FIX (CRITICAL-02): Internal auth header required by TollGate middleware.
+                        "X-Tollgate-Key": os.getenv("TOLLGATE_INTERNAL_KEY", ""),
+                    }
                 )
                 loop = asyncio.get_running_loop()
                 def call_gate():
@@ -306,7 +195,46 @@ class GroundedSynthesizer:
                 answer_raw = data["candidates"][0]["content"]["parts"][0]["text"].strip()
                 print(f"[Synthesizer] Bezpośredni Gemini answer raw: {answer_raw}")
             except Exception as e:
-                print(f"[GroundedSynthesizer] Błąd bezpośredniego Gemini API: {e}, próba lokalnego LLM / fallback.")
+                last_error = f"Błąd Gemini API: {e}"
+                print(f"[GroundedSynthesizer] {last_error}, próba AWS Bedrock / lokalnego LLM.")
+
+        # Bezpośredni fallback do AWS Bedrock (Anthropic Claude 3.5 / 4.5 Sonnet)
+        if not answer_raw and retrieved_chunks:
+            aws_key = os.getenv("AWS_ACCESS_KEY_ID", "")
+            aws_sec = os.getenv("AWS_SECRET_ACCESS_KEY", "")
+            aws_model = os.getenv(
+                "AWS_BEDROCK_MODEL_ID",
+                "arn:aws:bedrock:eu-central-1:832191487769:inference-profile/eu.anthropic.claude-sonnet-4-5-20250929-v1:0"
+            )
+            if aws_key and aws_sec and aws_model:
+                try:
+                    import boto3
+                    boto_client = boto3.Session(
+                        aws_access_key_id=aws_key,
+                        aws_secret_access_key=aws_sec,
+                        region_name=os.getenv("AWS_REGION", "eu-central-1")
+                    ).client("bedrock-runtime")
+                    loop = asyncio.get_running_loop()
+
+                    def call_bedrock():
+                        resp = boto_client.converse(
+                            modelId=aws_model,
+                            system=[{"text": STRICT_SYSTEM_PROMPT}],
+                            messages=[{"role": "user", "content": [{"text": user_prompt}]}],
+                            inferenceConfig={"maxTokens": 1024, "temperature": 0.1}
+                        )
+                        output_msg = resp.get("output", {}).get("message", {})
+                        txt = ""
+                        for c in output_msg.get("content", []):
+                            if "text" in c:
+                                txt += c["text"]
+                        return txt
+
+                    answer_raw = await loop.run_in_executor(None, call_bedrock)
+                    print(f"[Synthesizer] AWS Bedrock Claude answer raw: {answer_raw[:80]}...")
+                except Exception as eb:
+                    last_error = f"Błąd AWS Bedrock API: {eb}"
+                    print(f"[GroundedSynthesizer] {last_error}")
 
         if not answer_raw and self.use_local_llm and self.llm and retrieved_chunks:
             try:
@@ -327,10 +255,14 @@ class GroundedSynthesizer:
                 answer_raw = completion["choices"][0]["message"]["content"].strip()
                 print(f"[Synthesizer] Local LLM answer raw: {answer_raw}")
             except Exception as e:
-                print(f"[GroundedSynthesizer] Błąd inferencji lokalnego LLM: {e}, fallback do silnika deterministycznego.")
-                answer_raw = self._synthesize_answer_deterministic(query, retrieved_chunks, is_low_confidence)
-        elif not answer_raw:
-            answer_raw = self._synthesize_answer_deterministic(query, retrieved_chunks, is_low_confidence)
+                last_error = f"Błąd inferencji lokalnego LLM: {e}"
+                print(f"[GroundedSynthesizer] {last_error}")
+                answer_raw = f"BŁĄD MODELU: {last_error}"
+        if not answer_raw:
+            if last_error:
+                answer_raw = f"BŁĄD MODELU: {last_error}"
+            else:
+                answer_raw = "BŁĄD MODELU: Brak skonfigurowanego klucza API (Gemini/AWS) i brak lokalnego LLM."
 
         # 3. Post-Processing Citation Validator
         is_all_valid, verified_sources, sanitized_answer = self.validator.validate_citations(
@@ -353,12 +285,16 @@ class GroundedSynthesizer:
             await asyncio.sleep(0.015)
 
         # 5. Zwrócenie ustrukturyzowanego kontraktu na końcu strumienia
-        if gemini_key and answer_raw:
+        if "gate_data" in locals() and "bedrock" in str(gate_data.get("route", "")):
+            strategy_name = "Hybrid BM25 + Dense + RRF + CrossEncoder + AWS Bedrock Claude Sonnet (Tollgate Failover)"
+        elif gemini_key and answer_raw and "bedrock" not in str(locals().get("aws_model", "")).lower():
             strategy_name = f"Hybrid BM25 + Dense + RRF + CrossEncoder + Google Gemini ({settings.gemini_model_name})"
+        elif answer_raw and "boto_client" in locals():
+            strategy_name = "Hybrid BM25 + Dense + RRF + CrossEncoder + AWS Bedrock Claude 3.5/4.5 Sonnet"
         elif self.use_local_llm and self.llm:
             strategy_name = "Hybrid BM25 + Dense + RRF + CrossEncoder + Qwen2.5-3B Local LLM"
         else:
-            strategy_name = "Hybrid BM25 + Dense + RRF + CrossEncoder (Offline Engine)"
+            strategy_name = "Hybrid BM25 + Dense + RRF + CrossEncoder (No LLM)"
         grounded_resp = GroundedResponse(
             answer=sanitized_answer,
             is_confident=is_confident,
